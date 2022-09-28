@@ -1,8 +1,12 @@
+require("dotenv").config();
 const express = require("express");
+const app = express();
 
+const connectDB = require("./db/mongodb.connect");
 const todoRoutes = require("./routes/todo.routes");
 
-const app = express();
+const mongoURI = `${process.env.MONGOURI}`;
+connectDB(mongoURI);
 
 app.use(express.json()); // middleware to parse the json
 app.use(express.urlencoded({ extended: false }));
