@@ -11,7 +11,7 @@ let req, res, next; // let so its modified/reset when different test is called
 beforeEach(() => {
   req = httpMocks.createRequest();
   res = httpMocks.createResponse();
-  next = null;
+  next = jest.fn();
 });
 
 describe("TodoController.createTodo", () => {
@@ -44,5 +44,14 @@ describe("TodoController.createTodo", () => {
     TodoModel.create.mockReturnValue(newTodo);
     await TodoController.createTodo(req, res, next);
     expect(res._getJSONData()).toStrictEqual(newTodo);
+  });
+
+  // test if error handling is working
+  it("should handle errors", async () => {
+    const errMessage = { message: "Done property missing" };
+    const rejectedPromise = Promise.reject(errMessage);
+    TodoModel.create.mockReturnValue(rejectedPromise);
+    await TodoController.createTodo(req, res, next);
+    expect(next).toBeCalledWith(errMessage);
   });
 });

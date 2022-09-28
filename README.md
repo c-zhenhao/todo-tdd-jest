@@ -4,3 +4,8 @@ https://nlbsg.udemy.com/course/nodejs-unit-testing-and-integration-testing-with-
 
 jest documentation with mongoose:
 https://mongoosejs.com/docs/jest
+
+## Issues faced
+
+- trying to do an integration test which exceeded the default timeout value of 5s (5000ms)
+- attempted fix: increase timeout value in jest.config.js
