@@ -5,7 +5,15 @@ exports.createTodo = async (req, res, next) => {
     const createdTodo = await TodoModel.create(req.body);
     res.status(201).json(createdTodo);
   } catch (err) {
-    console.log(err);
+    next(err);
+  }
+};
+
+exports.getTodos = async (req, res, next) => {
+  try {
+    const allTodos = await TodoModel.find({});
+    res.status(201).json(allTodos);
+  } catch (err) {
     next(err);
   }
 };
