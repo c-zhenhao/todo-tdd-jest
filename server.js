@@ -1,11 +1,6 @@
-const express = require("express");
-const app = express();
+const app = require("./app");
 
-app.get("/", (req, res) => {
-  res.json("Hello World! With nodemon");
-});
-
-PORT = 3000;
+PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server started on ${PORT}`);
+  console.log(`server started on ${PORT}`);
 });
