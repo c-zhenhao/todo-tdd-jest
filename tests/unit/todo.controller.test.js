@@ -1,13 +1,13 @@
 const TodoController = require("../../controllers/todo.controller");
 const TodoModel = require("../../models/todo.model");
-const httpMocks = require("node-mocks-http");
 
+const httpMocks = require("node-mocks-http");
 const newTodo = require("../mock-data/new-todo.json");
 const allTodos = require("../mock-data/all-todos.json");
-
 TodoModel.create = jest.fn();
 TodoModel.find = jest.fn();
 TodoModel.findById = jest.fn();
+TodoModel.findByIdAndUpdate = jest.fn();
 
 // runs before each unit test
 let req, res, next; // let so its modified/reset when different test is called
@@ -126,6 +126,55 @@ describe("TodoController.getTodoById", () => {
   it("should return 404 when item doesnt exist", async () => {
     TodoModel.findById.mockReturnValue(null);
     await TodoController.getTodoById(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+});
+
+describe("TodoController.updateTodo", () => {
+  it("should have an updateTodo function", () => {
+    expect(typeof TodoController.updateTodo).toBe("function");
+  });
+
+  it("should update with TodoModel.findByIdAndUpdate", async () => {
+    req.params.id = "63341570670c0efa2dbdb135"; // can make this a const
+    req.body = newTodo;
+    await TodoController.updateTodo(req, res, next);
+
+    expect(TodoModel.findByIdAndUpdate).toHaveBeenCalledWith(
+      "63341570670c0efa2dbdb135",
+      newTodo,
+      {
+        new: true,
+        useFindAndModify: false,
+      }
+    );
+  });
+
+  it("should return a response with json data and http code 201", async () => {
+    req.params.id = "63341570670c0efa2dbdb135";
+    req.body = newTodo;
+    TodoModel.findByIdAndUpdate.mockReturnValue(newTodo);
+    await TodoController.updateTodo(req, res, next);
+
+    expect(res._isEndCalled()).toBeTruthy();
+    expect(res.statusCode).toBe(201);
+    expect(res._getJSONData()).toStrictEqual(newTodo);
+  });
+
+  it("should handle errors in updateTodo", async () => {
+    const errMessage = { message: "error updating todo by id" };
+    const rejectedPromise = Promise.reject(errMessage);
+    TodoModel.findByIdAndUpdate.mockReturnValue(rejectedPromise);
+    await TodoController.updateTodo(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(errMessage);
+  });
+
+  it("should return 404 when item doesnt exist", async () => {
+    TodoModel.findByIdAndUpdate.mockReturnValue(null);
+    await TodoController.updateTodo(req, res, next);
 
     expect(res.statusCode).toBe(404);
     expect(res._isEndCalled()).toBeTruthy();

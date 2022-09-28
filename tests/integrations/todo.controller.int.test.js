@@ -5,6 +5,7 @@ const newTodo = require("../mock-data/new-todo.json");
 
 const endpointUrl = "/todos";
 let firstTodo; // variable to store the first todo from the database
+let newTodoId; // variable for the integration test todo POST to be used later in PATCH test
 
 describe(endpointUrl, () => {
   it("POST " + endpointUrl, async () => {
@@ -13,6 +14,9 @@ describe(endpointUrl, () => {
     expect(response.statusCode).toBe(201);
     expect(response.body.title).toBe(newTodo.title);
     expect(response.body.done).toBe(newTodo.done);
+
+    newTodoId = response.body._id;
+    // console.log(newTodoId);
   });
 
   it(
@@ -59,5 +63,16 @@ describe(endpointUrl, () => {
     );
 
     expect(response.statusCode).toBe(404);
+  });
+
+  test("PATCH by Id" + endpointUrl + "/:id", async () => {
+    const testData = { title: "make integration test for PATCH", done: true };
+    const response = await request(app)
+      .patch(endpointUrl + "/" + newTodoId)
+      .send(testData);
+
+    expect(response.statusCode).toBe(201);
+    expect(response.body.title).toBe(testData.title);
+    expect(response.body.done).toBe(testData.done);
   });
 });
