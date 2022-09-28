@@ -4,10 +4,12 @@ const TodoModel = require("../../models/todo.model");
 const httpMocks = require("node-mocks-http");
 const newTodo = require("../mock-data/new-todo.json");
 const allTodos = require("../mock-data/all-todos.json");
+// jest.mock("../../models/todo.model"); // mock the entire model below rather than typing all these
 TodoModel.create = jest.fn();
 TodoModel.find = jest.fn();
 TodoModel.findById = jest.fn();
 TodoModel.findByIdAndUpdate = jest.fn();
+TodoModel.findByIdAndDelete = jest.fn();
 
 // runs before each unit test
 let req, res, next; // let so its modified/reset when different test is called
@@ -175,6 +177,47 @@ describe("TodoController.updateTodo", () => {
   it("should return 404 when item doesnt exist", async () => {
     TodoModel.findByIdAndUpdate.mockReturnValue(null);
     await TodoController.updateTodo(req, res, next);
+
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+});
+
+describe("TodoController.delete", () => {
+  it("should have deleteTodo function", () => {
+    expect(typeof TodoController.deleteTodo).toBe("function");
+  });
+
+  it("should call TodoModel.findByIdAndDelete", async () => {
+    req.params.id = "63346f7e6d4419346083d19a";
+    await TodoController.deleteTodo(req, res, next);
+
+    expect(TodoModel.findByIdAndDelete).toHaveBeenCalledWith(
+      "63346f7e6d4419346083d19a"
+    );
+  });
+
+  it("should respond with 200 OK and the deleted todo", async () => {
+    TodoModel.findByIdAndDelete.mockReturnValue(newTodo);
+    await TodoController.deleteTodo(req, res, next);
+
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toStrictEqual(newTodo);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+
+  it("should handle errors in deleteTodo", async () => {
+    const errMessage = { message: "error deleting todo by id" };
+    const rejectedPromise = Promise.reject(errMessage);
+    TodoModel.findByIdAndDelete.mockReturnValue(rejectedPromise);
+    await TodoController.deleteTodo(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(errMessage);
+  });
+
+  it("should return 404 when item doesnt exist", async () => {
+    TodoModel.findByIdAndDelete.mockReturnValue(null);
+    await TodoController.deleteTodo(req, res, next);
 
     expect(res.statusCode).toBe(404);
     expect(res._isEndCalled()).toBeTruthy();

@@ -6,6 +6,7 @@ const newTodo = require("../mock-data/new-todo.json");
 const endpointUrl = "/todos";
 let firstTodo; // variable to store the first todo from the database
 let newTodoId; // variable for the integration test todo POST to be used later in PATCH test
+const testData = { title: "make integration test for PATCH", done: true }; // reuse in delete
 
 describe(endpointUrl, () => {
   it("POST " + endpointUrl, async () => {
@@ -18,7 +19,6 @@ describe(endpointUrl, () => {
     newTodoId = response.body._id;
     // console.log(newTodoId);
   });
-
   it(
     "should return error 500 on malformed data with POST" + endpointUrl,
     async () => {
@@ -56,7 +56,6 @@ describe(endpointUrl, () => {
     expect(response.body.done).toBeDefined();
     expect(response.body.done).toBe(firstTodo.done);
   });
-
   test("getTodoById doesnt exist" + endpointUrl + "/:id", async () => {
     const response = await request(app).get(
       endpointUrl + "/" + "5f0d6e3d1c9d440000c0f5a1"
@@ -66,7 +65,6 @@ describe(endpointUrl, () => {
   });
 
   test("PATCH by Id" + endpointUrl + "/:id", async () => {
-    const testData = { title: "make integration test for PATCH", done: true };
     const response = await request(app)
       .patch(endpointUrl + "/" + newTodoId)
       .send(testData);
@@ -75,4 +73,31 @@ describe(endpointUrl, () => {
     expect(response.body.title).toBe(testData.title);
     expect(response.body.done).toBe(testData.done);
   });
+  it("should return 404 on PATCH" + endpointUrl + "/:id", async () => {
+    const res = await request(app)
+      .patch(endpointUrl + "/5f0d6e3d1c9d440000c0f5a1")
+      .send(testData); // non-existent id
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  test("DELETE by Id" + endpointUrl + "/:id", async () => {
+    const res = await request(app)
+      .delete(endpointUrl + "/" + newTodoId)
+      .send();
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.title).toBe(testData.title);
+    expect(res.body.done).toBe(testData.done);
+  });
+  it(
+    "should return 404 on DELETE when id doesnt exist" + endpointUrl + "/:id",
+    async () => {
+      const res = await request(app)
+        .delete(endpointUrl + "/5f0d6e3d1c9d440000c0f5a1")
+        .send();
+
+      expect(res.statusCode).toBe(404);
+    }
+  );
 });
