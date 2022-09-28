@@ -30,12 +30,14 @@ describe("TodoController.createTodo", () => {
     // expect(TodoModel.create).toBeCalled();
     // req.body = newTodo;
     await TodoController.createTodo(req, res, next);
+
     expect(TodoModel.create).toBeCalledWith(newTodo);
   });
 
   it("should return 201 response code", async () => {
     // req.body = newTodo;
     await TodoController.createTodo(req, res, next);
+
     expect(res.statusCode).toBe(201);
     expect(res._isEndCalled()).toBeTruthy(); // test if sending back something
   });
@@ -43,6 +45,7 @@ describe("TodoController.createTodo", () => {
   it("should return json body in response", async () => {
     TodoModel.create.mockReturnValue(newTodo);
     await TodoController.createTodo(req, res, next);
+
     expect(res._getJSONData()).toStrictEqual(newTodo);
   });
 
@@ -52,6 +55,7 @@ describe("TodoController.createTodo", () => {
     const rejectedPromise = Promise.reject(errMessage);
     TodoModel.create.mockReturnValue(rejectedPromise);
     await TodoController.createTodo(req, res, next);
+
     expect(next).toBeCalledWith(errMessage);
   });
 });
