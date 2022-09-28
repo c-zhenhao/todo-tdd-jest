@@ -14,7 +14,7 @@ https://mongoosejs.com/docs/jest
   - ![500](https://user-images.githubusercontent.com/16322250/192814543-84faefec-fb70-4161-b36d-28a2de4c3b90.png)
   - it works in postman because in package.json, `yarn start` or `yarn dev` specifies `server.js`
   - fixed by moving the connectDB function to app.js
-  
-  ## done lol
-  [image](https://udemy-certificate.s3.amazonaws.com/image/UC-11c9060a-22ff-444c-a3d8-d0db4543f75b.jpg)
-  
+
+## done lol
+
+![image](https://udemy-certificate.s3.amazonaws.com/image/UC-11c9060a-22ff-444c-a3d8-d0db4543f75b.jpg)
