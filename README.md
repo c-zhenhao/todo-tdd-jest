@@ -8,4 +8,5 @@ https://mongoosejs.com/docs/jest
 ## Issues faced
 
 - trying to do an integration test which exceeded the default timeout value of 5s (5000ms)
+![image](https://user-images.githubusercontent.com/16322250/192750626-015817e9-03a2-410b-800b-3e7e7c6ffe1e.png)
 - attempted fix: increase timeout value in jest.config.js
